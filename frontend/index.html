@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillSphere AI - Developer Interview Platform</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Optional: BoxIcons for sidebar icons -->
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+</head>
+
+<body>
+
+  <!-- PUBLIC LAYOUT (Landing & Auth) -->
+  <div id="public-layout" class="layout-active">
+    <nav class="public-nav">
+      <a href="#" class="logo">
+        <i class='bx bx-code-alt logo-icon'></i>
+        SkillSphere<span class="text-accent">AI</span>
+      </a>
+      <div id="nav-actions">
+        <button class="btn btn-outline" onclick="app.navigate('auth')">Sign In</button>
+        <button class="btn btn-primary" onclick="app.navigate('auth')">Get Started</button>
+      </div>
+    </nav>
+
+    <!-- Landing View -->
+    <section id="view-landing" class="section active">
+      <div class="hero-container">
+        <div class="hero-content">
+          <div class="badge badge-accent mb-4">v2.0 Beta Live</div>
+          <h1 class="hero-title">A New Standard for <br><span class="text-accent">Technical Mastery.</span></h1>
+          <p class="hero-subtitle">Engage in rigorous, multi-stage AI-driven technical interviews. Analyze your coding
+            decisions, learn from granular feedback, and prepare to ace real-world engineering challenges.</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary btn-lg" onclick="app.navigate('auth')">Start Practicing</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="code-window">
+            <div class="code-header">
+              <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            </div>
+            <pre><code><span class="keyword">function</span> <span class="func">evaluateCandidate</span>(skill) {
+  <span class="keyword">const</span> ai = <span class="keyword">new</span> SkillSphereAI();
+  <span class="keyword">const</span> result = ai.analyze(skill.responses);
+  
+  <span class="keyword">return</span> result.readiness > <span class="num">90</span> 
+    ? <span class="string">"Hired"</span> 
+    : <span class="string">"Keep Learning"</span>;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Auth View -->
+    <section id="view-auth" class="section">
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <div class="auth-header">
+            <i class='bx bx-terminal auth-icon'></i>
+            <h2>Initialize <span class="text-accent">Profile</span></h2>
+            <p class="text-muted">Enter your developer alias and select a career path to configure the AI system.</p>
+          </div>
+          <form id="auth-form" onsubmit="app.handleAuth(event)">
+            <div class="form-group">
+              <label>Developer Alias</label>
+              <input type="text" id="username" class="form-control" placeholder="e.g. CodeNinja" required>
+            </div>
+            <div class="form-group">
+              <label>Target Engineering Role</label>
+              <select id="role" class="form-control">
+                <option value="Student Intern">Student / Intern (Campus)</option>
+                <option value="New Grad">New Grad / Entry Level</option>
+                <option value="Java Developer">Backend Java Engineer</option>
+                <option value="Frontend Developer">Frontend / React Engineer</option>
+                <option value="Fullstack Developer">Fullstack Engineer</option>
+                <option value="Data Scientist">Data Scientist</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Access System</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- APP LAYOUT (Logged In Sidebar) -->
+  <div id="app-layout" style="display: none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <i class='bx bx-layer'></i> SkillSphere
+      </div>
+      <ul class="sidebar-nav">
+        <li class="nav-item active" id="nav-dashboard" onclick="app.navigate('dashboard')">
+          <i class='bx bx-grid-alt'></i> Dashboard
+        </li>
+        <li class="nav-item" id="nav-study-plan" onclick="app.navigate('study-plan')">
+          <i class='bx bx-book-bookmark'></i> Study Plans <span class="badge badge-accent ml-2 text-sm"
+            style="font-size:0.6rem;">NEW</span>
+        </li>
+        <li class="nav-item" id="nav-setup-interview" onclick="app.navigate('setup-interview')">
+          <i class='bx bx-brain'></i> Mock Interview
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar"><i class='bx bx-user'></i></div>
+          <div class="user-info">
+            <span class="user-name" id="nav-username">User</span>
+            <span class="user-role text-muted" id="nav-role" style="font-size: 0.75rem;">Role</span>
+          </div>
+        </div>
+        <button class="btn btn-outline btn-sm w-100 mt-3" onclick="app.logout()">
+          <i class='bx bx-log-out'></i> Disconnect
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-body">
+
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <h2 id="page-title">Dashboard</h2>
+        <div class="topbar-actions">
+          <span class="system-status"><span class="pulse-dot"></span> AI Engine Online</span>
+        </div>
+      </header>
+
+      <div class="content-container">
+
+        <!-- Dashboard View -->
+        <section id="view-dashboard" class="app-section active">
+          <div class="welcome-banner">
+            <div>
+              <h3>Welcome back, <span class="text-accent" id="dash-username">User</span></h3>
+              <p>Your performance analytics and skill trajectory.</p>
+            </div>
+            <button class="btn btn-primary" onclick="app.navigate('setup-interview')"><i class='bx bx-play'></i> New
+              Session</button>
+          </div>
+
+          <div class="stats-grid mt-4">
+            <div class="stat-card">
+              <div class="stat-icon"><i class='bx bx-check-shield'></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Interviews</span>
+                <span class="stat-value" id="stat-interviews">0</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class='bx bx-target-lock'></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Avg. Score</span>
+                <span class="stat-value" id="stat-score">0%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class='bx bx-line-chart'></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Readiness</span>
+                <span class="stat-value text-accent" id="stat-readiness">0%</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class='bx bx-medal'></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Top Skill</span>
+                <span class="stat-value" id="stat-strongest" style="font-size: 1.2rem;">N/A</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-layout mt-4">
+            <div class="chart-card flex-2">
+              <h4>Performance Trajectory</h4>
+              <div class="chart-wrapper"><canvas id="growthChart"></canvas></div>
+            </div>
+            <div class="chart-card flex-1">
+              <h4>Competency Radar</h4>
+              <div class="chart-wrapper"><canvas id="radarChart"></canvas></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Setup Interview View -->
+        <section id="view-setup-interview" class="app-section">
+          <div class="form-card">
+            <div class="form-header">
+              <i class='bx bx-slider-alt'></i>
+              <h3>Configure Simulation</h3>
+              <p class="text-muted">Target specific technologies for this mock session.</p>
+            </div>
+            <form onsubmit="app.startInterview(event)" class="mt-4">
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label>Technology Stack</label>
+                  <select id="interview-tech" class="form-control">
+                    <option value="Java" selected>Java Core & Ecosystem</option>
+                    <option value="Python">Python</option>
+                    <option value="JavaScript">JavaScript / React</option>
+                    <option value="SQL">Database Engineering (SQL)</option>
+                    <option value="Cloud">Cloud Architecture (AWS/GCP)</option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label>Evaluation Category</label>
+                  <select id="interview-category" class="form-control">
+                    <option value="Technical Core" selected>Language Core / Syntax</option>
+                    <option value="System Design">Architecture & System Design</option>
+                    <option value="Data Structures">Algorithms & Data Structures</option>
+                    <option value="Behavioral">Behavioral & Cultural Mix</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label>Academic / Complexity Level</label>
+                  <select id="interview-difficulty" class="form-control">
+                    <option value="Freshman">Freshman / Beginner</option>
+                    <option value="Sophomore/Junior" selected>Junior / Summer Intern</option>
+                    <option value="New Grad">Senior / New Grad</option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label>Session Length</label>
+                  <select id="interview-count" class="form-control">
+                    <option value="3" selected>Short (3 Scenarios)</option>
+                    <option value="5">Standard (5 Scenarios)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-actions mt-4">
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                  <i class='bx bx-power-off'></i> Initialize AI Evaluator <span class="loader ml-2"
+                    style="display:none;" id="loader-start"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Study Plan View (NEW) -->
+        <section id="view-study-plan" class="app-section">
+          <div class="welcome-banner">
+            <div>
+              <h3><i class='bx bx-map-alt text-accent'></i> Campus Placement Roadmaps</h3>
+              <p>Generate targeted study guides tailored for internships and new grad roles.</p>
+            </div>
+          </div>
+          <div class="form-card mt-4">
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>Target Company Tier</label>
+                <select id="plan-tier" class="form-control">
+                  <option value="FAANG">FAANG / Big Tech</option>
+                  <option value="Startups">High-Growth Startups</option>
+                  <option value="Enterprise">Enterprise / IT Services (TCS, Infosys, etc.)</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label>Primary Stack</label>
+                <select id="plan-stack" class="form-control">
+                  <option value="DSA">Data Structures & Algorithms (General)</option>
+                  <option value="Java">Java / Spring Boot</option>
+                  <option value="JavaScript">JavaScript / MERN Stack</option>
+                  <option value="Python">Python / Django Backend</option>
+                  <option value="Data Science">Machine Learning / Data Science</option>
+                  <option value="Cloud">Cloud Engineering (AWS/GCP)</option>
+                  <option value="C++">C++ Systems / Game Dev</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary mt-2" onclick="app.generateStudyPlan()"><i class='bx bx-cog'></i> Generate
+              Plan <span class="loader ml-2" style="display:none;" id="loader-plan"></span></button>
+          </div>
+
+          <div id="plan-output-container" class="mt-4" style="display:none;">
+            <div class="feedback-card" id="plan-output-content">
+              <!-- Auto-populated by Marked.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Active Interview View -->
+        <section id="view-interview" class="app-section">
+          <div class="interview-workspace">
+            <div class="interview-pane question-pane">
+              <div class="pane-header">
+                <span class="badge badge-accent" id="int-counter">Question 1/3</span>
+                <div class="tags">
+                  <span class="badge badge-dark" id="int-topic">Java Core</span>
+                  <span class="badge badge-outline" id="int-level">Mid-Level</span>
+                </div>
+              </div>
+              <div class="question-content mt-4" id="int-question-container">
+                <h4>System Prompt:</h4>
+                <div id="int-question" class="question-text">Connecting to intelligence engine...</div>
+              </div>
+            </div>
+
+            <div class="interview-pane answer-pane">
+              <div class="pane-header">
+                <h4>Candidate Input</h4>
+                <span class="text-muted text-sm" id="int-progress">Step 1 of 3</span>
+              </div>
+              <textarea id="int-answer" class="editor-input"
+                placeholder="> Enter your technical implementation or conceptual explanation here..."></textarea>
+              <div class="terminal-container mt-2" id="terminal-panel" style="display: none;">
+                <div class="terminal-header">
+                  <span class="text-muted"><i class='bx bx-terminal'></i> System Output Stream</span>
+                </div>
+                <div class="terminal-body" id="terminal-output">
+                  <span class="text-accent">> Ready.</span>
+                </div>
+              </div>
+              <div class="pane-footer mt-3">
+                <button class="btn btn-primary" id="btn-submit-answer" onclick="app.submitAnswer()">
+                  Execute & Proceed <i class='bx bx-right-arrow-alt'></i>
+                  <span class="loader ml-2" style="display:none;" id="loader-eval"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Results View -->
+        <section id="view-results" class="app-section">
+          <div class="results-layout">
+            <div class="results-sidebar">
+              <div class="score-card">
+                <h4 class="text-muted">Session Aggregate</h4>
+                <div class="score-circle">
+                  <span id="res-score">0</span>
+                </div>
+                <p class="mt-3 text-accent"><i class='bx bx-check-circle'></i> Evaluation Built</p>
+                <button class="btn btn-outline w-100 mt-4" onclick="app.navigate('dashboard')">Return to
+                  Dashboard</button>
+              </div>
+              <div class="score-card mt-4" style="padding: 1.5rem; text-align: left;">
+                <h5 class="text-accent mb-2"><i class='bx bx-compass'></i> AI Guidance</h5>
+                <p id="res-guidance" style="font-size: 0.9rem; color: var(--text-main); line-height: 1.5;"></p>
+              </div>
+            </div>
+            <div class="results-main">
+              <h3>Diagnostic Report</h3>
+              <p class="text-muted mb-4">Detailed breakdown of your reasoning and code accuracy per prompt.</p>
+              <div id="res-breakdown" class="feedback-list">
+                <!-- Dynamically injected -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- CodeMirror Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
+
+  <script src="./js/app.js"></script>
+</body>
+
+</html>
