@@ -45,6 +45,6 @@ Because it's vanilla JS, you don't even need Node.js to run it.
 ## Future Ideas
 I'm planning to eventually hook the backend up directly to the Gemini or OpenAI API to actually grade the user's CodeMirror input in real-time, rather than just simulating the backend terminal output. 
 
-Feel free to fork it, break it, or use it to study!
+Feel free to fork it, break it, or use it to study..!
 Live Demo: https://get-skillsphere-ai.netlify.app/
 
