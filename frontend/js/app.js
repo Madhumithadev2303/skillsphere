@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://skillsphere-production-8468.up.railway.app/api';
 
 const app = {
     currentUser: null,
